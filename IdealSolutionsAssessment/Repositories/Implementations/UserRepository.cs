@@ -25,20 +25,13 @@ public class UserRepository : IUserRepository
         return Task.CompletedTask;
     }
 
-    public Task DeleteAsync(User user/*, Guid userToAssignID*/)
+    public async Task DeleteAsync(User user)
     {
-        _context.Users.Remove(user);// There will be tasks with AssignedUserId not exist, wow magic
+        var taskToBeDeleted = await _context.Tasks.Where(tsk => tsk.AssignedUserId == user.Id).ToListAsync();
 
-        
-        //_context.Tasks.RemoveRange(user.Tasks);//Should we delete all tasks attached that user?
+        _context.Users.Remove(user);
 
-        
-        //foreach (var task in user.Tasks)// or change it to another user
-        //{
-        //    task.AssignedUserId = userToAssignID;
-        //}
-
-        return Task.CompletedTask;
+        _context.Tasks.RemoveRange(taskToBeDeleted);
     }
 
     public async Task<User?> GetByUsernameAndPasswordAsync(string username, string password)

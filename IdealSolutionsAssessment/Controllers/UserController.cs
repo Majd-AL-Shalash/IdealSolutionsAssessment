@@ -18,6 +18,10 @@ public class UserController : ControllerBase
         _userService = userService;
     }
 
+    /// <summary>
+    /// Gets all users. Only accessible by Admins.
+    /// </summary>
+    /// <returns code="200">List of all users.</returns>
     [HttpGet]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<IEnumerable<UserDTO>>> GetUsers()
@@ -26,6 +30,10 @@ public class UserController : ControllerBase
         return Ok(users);
     }
 
+    /// <summary>
+    /// Gets the currently authenticated user's profile.
+    /// </summary>
+    /// <returns code="200">The current user's profile information.</returns>
     [HttpGet("me")]
     public async Task<ActionResult<UserDTO>> GetCurrentUser()
     {
@@ -36,6 +44,12 @@ public class UserController : ControllerBase
         return Ok(user);
     }
 
+    /// <summary>
+    /// Gets a user by their ID. Only accessible by Admins.
+    /// </summary>
+    /// <param name="id">The ID of the user.</param>
+    /// <response code="200">Returns the task details.</response>
+    /// <response code="404">User not found.</response>    
     [HttpGet("{id}")]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<UserDTO>> GetUser(Guid id)
@@ -47,6 +61,11 @@ public class UserController : ControllerBase
         return Ok(user);
     }
 
+    /// <summary>
+    /// Creates a new user. Only accessible by Admins.
+    /// </summary>
+    /// <param name="dto">User creation data.</param>
+    /// <returns code="200">Created user information.</returns>
     [HttpPost]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<UserDTO>> CreateUser(CreateUserDTO dto)
@@ -55,8 +74,18 @@ public class UserController : ControllerBase
         return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
     }
 
+
+    /// <summary>
+    /// Updates another user's profile. Only accessible by Admins.
+    /// </summary>
+    /// <param name="id">User ID to update.</param>
+    /// <param name="dto">Updated user information.</param>
+    /// <response code="204">Update succeeded.</response>
+    /// <response code="404">Task not found.</response>
     [HttpPut("{id}")]
     [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateUserByAdmin(Guid id, UpdateUserDTO dto)
     {
         var success = await _userService.UpdateAsync(id, dto);
@@ -67,7 +96,15 @@ public class UserController : ControllerBase
         return NoContent();
     }
 
+    /// <summary>
+    /// Updates the currently authenticated user's profile.
+    /// </summary>
+    /// <param name="dto">Updated user information.</param>
+    /// <response code="204">Update succeeded.</response>
+    /// <response code="404">Task not found.</response>
     [HttpPut("me")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateOwnProfile(UpdateSelfUserDTO dto)
     {
         var userId = this.GetUserId();
@@ -87,8 +124,16 @@ public class UserController : ControllerBase
         return NoContent();
     }
 
+    /// <summary>
+    /// Deletes a user. Only accessible by Admins. Tasks with this user will also be deleted.
+    /// </summary>
+    /// <param name="id">The ID of the user to delete.</param>
+    /// <response code="204">Delete succeeded.</response>
+    /// <response code="404">User not found.</response>
     [HttpDelete("{id}")]
     [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)] 
+    [ProducesResponseType(StatusCodes.Status404NotFound)]  
     public async Task<IActionResult> DeleteUser(Guid id)
     {
         var success = await _userService.DeleteAsync(id);

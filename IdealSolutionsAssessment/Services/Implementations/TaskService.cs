@@ -54,7 +54,7 @@ public class TaskService : ITaskService
         {
             Title = dto.Title,
             Description = dto.Description,
-            Status = "Pending",
+            Status = dto.Status,
             AssignedUserId = dto.AssignedUserId
         };
 
@@ -86,6 +86,9 @@ public class TaskService : ITaskService
 
             if (!string.IsNullOrWhiteSpace(dto.Status))
                 task.Status = dto.Status;
+
+            if (dto.AssignedUserId != null)
+                task.AssignedUserId = dto.AssignedUserId.Value;
         }
         else
         {

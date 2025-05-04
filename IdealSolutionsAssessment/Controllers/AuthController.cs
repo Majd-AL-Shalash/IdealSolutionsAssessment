@@ -22,6 +22,13 @@ public class AuthController : ControllerBase
         _configuration = configuration;
     }
 
+    /// <summary>
+    /// Authenticates the user and generates an authorization token.
+    /// </summary>
+    /// <param name="loginDto">The login credentials (username and password).</param>
+    /// <returns>Returns an authorization token if authentication is successful, otherwise Unauthorized.</returns>
+    /// <response code="200">Returns the authentication token.</response>
+    /// <response code="401">Invalid username or password.</response>
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDTO loginDto)
     {
